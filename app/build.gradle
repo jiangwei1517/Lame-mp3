@@ -1,0 +1,55 @@
+//apply plugin: 'com.android.application'
+
+// 用com.android.model.application 代替 com.android.application
+apply plugin: 'com.android.model.application'
+
+// 将原来的配置用 model{}包起来
+model {
+    android {
+        // 取值必须使用 “=” 形式
+        // 否则会报 “Error:Cause: org.gradle.api.internal.ExtensibleDynamicObject” 错误
+        compileSdkVersion = 23
+        buildToolsVersion = '23.0.3'
+
+        defaultConfig {
+            // 取值必须使用 “=” 形式
+            applicationId = "com.jiangwei.jnitest"
+            //这里要注意是 xxSdkVersion.apiLevel
+            // 否则会报 “Unable to load class com.android.build.gradle.managed.ProductFlavor_Impl”错误
+            minSdkVersion.apiLevel = 15
+            targetSdkVersion.apiLevel = 23
+            versionCode =  1
+            versionName = "1.0"
+        }
+
+        // 配置NDK
+        ndk {
+            // 生成so的名字，是必须的
+            moduleName ="play_sound"
+            toolchain = 'clang'
+            cppFlags.add("-std=c++11")
+            // 添加依赖库
+            ldLibs.addAll(['android','OpenSLES', 'log', 'z', "EGL", "GLESv2", "dl"])
+            // 生成不同abi体系的so库
+            abiFilters.addAll(['armeabi', 'armeabi-v7a', 'arm64-v8a',
+                               'x86', 'x86_64',
+                               'mips', 'mips64'])
+            stl = "gnustl_shared"
+        }
+        buildTypes {
+            release {
+                minifyEnabled = false
+                // 这里注意：使用proguardFiles.add()方法
+                proguardFiles.add(file('proguard-rules.txt'))
+            }
+        }
+    }
+}
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    testCompile 'junit:junit:4.12'
+}
