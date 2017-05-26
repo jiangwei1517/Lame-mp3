@@ -93,17 +93,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, getLameVersionName(), Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_convert:
-                converToMp3(wavPath, mp3Path);
-                if (mp3.exists() && mp3.isFile()) {
-                    Toast.makeText(MainActivity.this, "转换成功,mp3大小是:" + mp3.length() + "B", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "file doesn't exist or is not a file", Toast.LENGTH_SHORT).show();
-                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        converToMp3(wavPath, mp3Path);
+                    }
+                }).start();
                 break;
             case R.id.btn_wav:
                 File wav = new File(wavPath);
                 if (wav.exists() && wav.isFile()) {
-                    mPlayer = new MediaPlayer();
                     try {
                         mPlayer.setDataSource(wavPath);
                         mPlayer.prepare();
@@ -118,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_mp3:
                 if (mp3.exists() && mp3.isFile()) {
-                    mPlayer = new MediaPlayer();
                     try {
                         mPlayer.setDataSource(mp3Path);
                         mPlayer.prepare();
